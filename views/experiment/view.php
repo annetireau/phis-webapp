@@ -4,7 +4,7 @@
 // SILEX-PHIS
 // Copyright © INRA 2018
 // Creation date: Feb, 2017
-// Contact: morgane.vidal@inra.fr, arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
+// Contact: arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
 //******************************************************************************
 
 use yii\helpers\Html;
@@ -33,8 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
             echo Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->uri], ['class' => 'btn btn-primary']);
         }
         ?>
-         <!-- Add annotation button -->
-        <?= AnnotationButtonWidget::widget([AnnotationButtonWidget::TARGETS => [$model->uri]]); ?>
         <?= Html::a(Yii::t('app', 'Add Document'), ['document/create', 'concernUri' => $model->uri, 'concernLabel' => $model->alias, 'concernRdfType' => Yii::$app->params["Experiment"]], ['class' => $dataDocumentsProvider->getCount() > 0 ? 'btn btn-success' : 'btn btn-warning']) ?>
         <?= Html::a(Yii::t('app', 'Map Visualization'), 
                 ['layer/view', 'objectURI' => $model->uri, 'objectType' => 'http://www.phenome-fppn.fr/vocabulary/2017#Experiment', 'depth' => 'true', 'generateFile' => 'false'], ['class' => 'btn btn-info']) ?>
@@ -43,7 +41,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 ['layer/view', 'objectURI' => $model->uri, 'objectType' => 'http://www.phenome-fppn.fr/vocabulary/2017#Experiment', 'depth' => 'true', 'generateFile' => 'true'], ['class' => 'btn btn-success']);
             }
          ?>
-        </p>
+        <!--add annotation button-->
+        <?= AnnotationButtonWidget::widget([AnnotationButtonWidget::TARGETS => [$model->uri]]); ?>
+    </p>
 
     <?php
     $attributes;
@@ -202,8 +202,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => $attributes
     ]);
     ?>
-    <!-- Experiment linked Annotation-->
-    <?= AnnotationGridViewWidget::widget(
+    <!-- AO Linked Annotation-->
+    <?= app\components\widgets\AnnotationGridViewWidget::widget(
             [
                  AnnotationGridViewWidget::ANNOTATIONS => ${ExperimentController::ANNOTATIONS_DATA}
             ]

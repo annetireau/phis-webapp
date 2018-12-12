@@ -4,7 +4,7 @@
 // SILEX-PHIS
 // Copyright © INRA 2018
 // Creation date: 6 Apr, 2017
-// Contact: morgane.vidal@inra.fr, arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
+// Contact: arnaud.charleroy@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
 //******************************************************************************
 
 use yii\helpers\Html;
@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     
     <p>
-        <!-- Add annotation button-->
+        <!--add annotation button-->
         <?= AnnotationButtonWidget::widget([AnnotationButtonWidget::TARGETS => [$model->uri]]); ?>
         <?= Html::a(Yii::t('app', 'Add Document'), ['document/create', 'concernUri' => $model->uri, 'concernLabel' => $model->label], ['class' => $dataDocumentsProvider->getCount() > 0 ? 'btn btn-success' : 'btn btn-warning']) ?>
     </p>
@@ -95,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]
     ]); ?>
     
-    <!-- Sensor linked Annotation-->
+    <!-- Sensor Linked Annotation-->
     <?= AnnotationGridViewWidget::widget(
             [
                  AnnotationGridViewWidget::ANNOTATIONS => ${SensorController::ANNOTATIONS_DATA}
