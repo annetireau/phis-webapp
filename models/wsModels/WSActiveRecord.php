@@ -1,26 +1,24 @@
 <?php
-
-//**********************************************************************************************
-//                                       WSActiveRecord.php 
-//
-// Author(s): Morgane VIDAL
-// PHIS-SILEX version 1.0
-// Copyright © - INRA - 2017
-// Creation date: February 2017
+//******************************************************************************
+//                         WSActiveRecord.php
+// SILEX-PHIS
+// Copyright © INRA 2017
+// Creation date: Feb, 2017
 // Contact: morgane.vidal@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
-// Last modification date:  February, 2017
-// Subject: An adapted Active Record based to request web services
-//          Based on the Yii Active Record of relational databases
-//          See Yii2 ActiveRecord documentation for more details
-//***********************************************************************************************
-
+//******************************************************************************
 namespace app\models\wsModels;
 
 /**
  * An active record for the web services. 
- * Adapted from the Yii2's ActiveRecord developped for relational databases
+ * An adapted Active Record based to request web services
+ * Based on the Yii Active Record of relational databases
+ * See Yii2 ActiveRecord documentation for more details
  * @see http://www.yiiframework.com/doc-2.0/guide-db-active-record.html
  * @author Morgane Vidal <morgane.vidal@inra.fr>
+ * @update [Arnaud Charleroy] 14 September, 2018 : Fix totalCount attribute when only 
+ *                                                 one element is returned 
+ * @update [Morgane Vidal] 6 November, 2018 : Add the management of the page number 
+ *                                            and the page size to send to the web service.
  */
 abstract class WSActiveRecord extends \yii\base\Model {
     
@@ -105,7 +103,7 @@ abstract class WSActiveRecord extends \yii\base\Model {
      * @return an array with the results,
                "token" if the user needs to log in (invalid token).
      */
-    public function find($sessionToken, $attributes) {
+    public function find($sessionToken, $attributes) {        
         $requestRes = $this->wsModel->get($sessionToken, "", $attributes);
 
         if (isset($requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION})) {
@@ -113,6 +111,11 @@ abstract class WSActiveRecord extends \yii\base\Model {
             $this->totalCount = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::TOTAL_COUNT};
             $this->page = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::CURRENT_PAGE};
             $this->pageSize = $requestRes->{WSConstants::METADATA}->{WSConstants::PAGINATION}->{WSConstants::PAGE_SIZE};
+        } else {
+            //SILEX:info
+            // A null pagination means only one result
+            //\SILEX:info
+            $this->totalCount = 1;
         }
         
         if (isset($requestRes->{WSConstants::RESULT}->{WSConstants::DATA}))  {
@@ -128,7 +131,13 @@ abstract class WSActiveRecord extends \yii\base\Model {
      * Used for the web service for example
      * @return array with the attributes. 
      */
-    abstract public function attributesToArray();
+    public function attributesToArray() {
+        $toReturn = null;
+        $toReturn[WSConstants::PAGE] = $this->page;
+        $toReturn[WSConstants::PAGE_SIZE] = $this->pageSize;
+        
+        return $toReturn;
+    }
     
     /**
      * allows to fill the attributes with the informations in the array given 

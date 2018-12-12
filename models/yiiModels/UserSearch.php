@@ -1,32 +1,33 @@
 <?php
-
 //**********************************************************************************************
 //                                       UserSearch.php 
-//
-// Author(s): Morgane VIDAL
-// PHIS-SILEX version 1.0
-// Copyright © - INRA - 2017
-// Creation date: April 2017
-// Contact: morgane.vidal@inra.fr, anne.tireau@inra.fr, pascal.neveu@inra.fr
-// Last modification date:  April, 2017
-// Subject: UserSearch represents the model behin the search form about app\models\User
-//          Based on the Yii2 Search basic classes
+// SILEX-PHIS
+// Copyright © INRA 2017
+// Creation date: Apr, 2017
+// Contact: morgane.vidal@inra.fr, arnaud.charleroy@inra.fr, anne.tireau@inra.fr,
+//          pascal.neveu@inra.fr
 //***********************************************************************************************
 
 namespace app\models\yiiModels;
 
 use app\models\yiiModels\YiiUserModel;
+use app\models\wsModels\WSConstants;
 
 /**
- * implements the search action for the users
- *
- * @author Morgane Vidal <morgane.vidal@inra.fr>
+ * UserSearch represents the model used for the search form about app\models\User
+ * Based on the Yii2 Search basic classes
+ * @author Morgane Vidal <morgane.vidal@inra.fr>, Arnaud Charleroy <arnaud.charleroy@inra.fr>
+ * @update [Arnaud Charleroy] 19 September, 2018 : Pagination fixed
  */
 class UserSearch extends YiiUserModel {
     //SILEX:refactor
     //create a trait (?) with methods search and jsonListOfArray and use it in 
     //each class ElementNameSearch
     //\SILEX:refactor
+    
+    public function __construct($pageSize = null, $page = null) {
+        parent::__construct($pageSize, $page);
+    }
     
     /**
      * @inheritdoc
@@ -61,8 +62,9 @@ class UserSearch extends YiiUserModel {
         
         if (is_string($findResult)) {
             return $findResult;
-        } else if (isset($findResult[\app\models\wsModels\WSConstants::TOKEN])) {
-            return $findResult;
+        } else if (isset($findResult->{'metadata'}->{'status'}[0]->{'exception'}->{'details'}) 
+                    && $findResult->{'metadata'}->{'status'}[0]->{'exception'}->{'details'} === \app\models\wsModels\WSConstants::TOKEN) {
+            return \app\models\wsModels\WSConstants::TOKEN;
         } else {
             $resultSet = $this->jsonListOfArraysToArray($findResult);
             return new \yii\data\ArrayDataProvider([

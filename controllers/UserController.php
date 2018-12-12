@@ -70,14 +70,22 @@ class UserController extends Controller {
     public function actionIndex() {
         $searchModel = new UserSearch();
         
-        $searchResult = $searchModel->search(Yii::$app->session['access_token'], Yii::$app->request->queryParams);
+        //Get the search params and update pagination
+        $searchParams = Yii::$app->request->queryParams;        
+        if (isset($searchParams[\app\models\yiiModels\YiiModelsConstants::PAGE])) {
+            $searchParams[\app\models\yiiModels\YiiModelsConstants::PAGE]--;
+        }
+
+        $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
        
         if (is_string($searchResult)) {
-            return $this->render('/site/error', [
-                    'name' => 'Internal error',
-                    'message' => $searchResult]);
-        } else if (is_array($searchResult) && isset($searchResult["token"])) { //user must log in
-            return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+            if ($searchResult === \app\models\wsModels\WSConstants::TOKEN) {
+                return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+            } else {
+                return $this->render('/site/error', [
+                        'name' => Yii::t('app/messages','Internal error'),
+                        'message' => $searchResult]);
+            }
         } else {
             return $this->render('index', [
                'searchModel' => $searchModel,
@@ -143,7 +151,7 @@ class UserController extends Controller {
             
             if (is_string($groups)) {
                 return $this->render('/site/error', [
-                    'name' => 'Internal error',
+                    'name' => Yii::t('app/messages','Internal error'),
                     'message' => $groups]);
             } else if (is_array ($groups) && isset($groups["token"])) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
@@ -202,7 +210,7 @@ class UserController extends Controller {
             
             if (is_string($groups)) {
                 return $this->render('/site/error', [
-                    'name' => 'Internal error',
+                    'name' => Yii::t('app/messages','Internal error'),
                     'message' => $groups]);
             } else if (is_array ($groups) && isset($groups["token"])) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
@@ -217,36 +225,5 @@ class UserController extends Controller {
                 ]);
             }
         }
-    }
-    
-    /**
-     * Return user instances list.
-     * Format [user uri => user name]
-     * e.g. ["http://www.phenome-fppn.fr/platform/agent/marie-emilie-jolie_dupont-prad" => "Marie-émilie jolie  Dupont-Prad"]
-     * @return array users instances list
-     */
-    public static function getUsersUriNameInstances() {
-        $searchUserModel = new UserSearch();
-        $requestRes = $searchUserModel->find(Yii::$app->session[\app\models\wsModels\WSConstants::ACCESS_TOKEN], ["pageSize" => 10000]);
-        
-        //SILEX:info
-        // if WS return a response
-        //\SILEX:info
-        if ($requestRes !== null) { 
-            if (!is_string($requestRes)) { 
-                foreach ($requestRes as $user) {
-                    $userInstances[$user->uri] = $user->firstName . " " . $user->familyName;
-                }
-                return $userInstances;
-            } else { 
-                //SILEX:info
-                // token invalid case
-                //\SILEX:info
-                if ($requestRes === \app\models\wsModels\WSConstants::TOKEN) { //L'utilisateur doit se connecter
-                    return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
-                }
-            }
-        } 
-        return $requestRes;
     }
 }

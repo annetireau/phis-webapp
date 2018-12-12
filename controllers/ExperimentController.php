@@ -79,14 +79,22 @@ class ExperimentController extends Controller {
     public function actionIndex() {
         $searchModel = new ExperimentSearch();
         
-        $searchResult = $searchModel->search(Yii::$app->session['access_token'], Yii::$app->request->queryParams);
+        //Get the search params and update pagination
+        $searchParams = Yii::$app->request->queryParams;        
+        if (isset($searchParams[\app\models\yiiModels\YiiModelsConstants::PAGE])) {
+            $searchParams[\app\models\yiiModels\YiiModelsConstants::PAGE]--;
+        }
+        
+        $searchResult = $searchModel->search(Yii::$app->session['access_token'], $searchParams);
        
         if (is_string($searchResult)) {
-            return $this->render('/site/error', [
-                    'name' => 'Internal error',
-                    'message' => $searchResult]);
-        } else if (is_array($searchResult) && isset($searchResult["token"])) { //L'utilisateur doit se connecter
-            return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+            if ($searchResult === \app\models\wsModels\WSConstants::TOKEN) {
+                return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
+            } else {
+                return $this->render('/site/error', [
+                        'name' => Yii::t('app/messages','Internal error'),
+                        'message' => $searchResult]);
+            }
         } else {
             return $this->render('index', [
                'searchModel' => $searchModel,
@@ -180,19 +188,6 @@ class ExperimentController extends Controller {
     }
     
     /**
-     * 
-     * @param mixed $contacts persons list
-     * @return ArrayHelper list of the persons 'email' => 'email'
-     */
-    private function contactsToMap($contacts) {
-        if ($contacts !== null) {
-            return \yii\helpers\ArrayHelper::map($contacts, 'email', 'email');
-        } else {
-            return null;
-        }
-    }
-    
-    /**
      * @action Create an Experiment
      * @return mixed
      */
@@ -229,8 +224,8 @@ class ExperimentController extends Controller {
             $searchProjectModel = new ProjectSearch();
             $projects = $searchProjectModel->find($sessionToken,[]);
             
-            $searchUserModel = new UserSearch();
-            $contacts = $searchUserModel->find($sessionToken, []);
+            $userModel = new \app\models\yiiModels\YiiUserModel();
+            $contacts = $userModel->getPersonsMailsAndName($sessionToken);
             
             $groups = null;
             
@@ -243,14 +238,13 @@ class ExperimentController extends Controller {
 
             if (is_string($projects) || is_string($groups)) {
                 return $this->render('/site/error', [
-                    'name' => 'Internal error',
+                    'name' => Yii::t('app/messages','Internal error'),
                     'message' => is_string($projects) ? $projects : $groups]);
             } else if (is_array($projects) && isset($projects["token"])) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
             } else {
                 $projects = $this->projectsToMap($projects);
                 $groups = $this->groupsToMap($groups);
-                $contacts = $this->contactsToMap($contacts);
                 $this->view->params['listProjects'] = $projects;
                 $this->view->params['listGroups'] = $groups;
                 $this->view->params['listContacts'] = $contacts;
@@ -323,19 +317,18 @@ class ExperimentController extends Controller {
             $searchGroupModel = new GroupSearch();
             $groups = $searchGroupModel->find($sessionToken,[]);
             
-            $searchUserModel = new UserSearch();
-            $contacts = $searchUserModel->find($sessionToken, []);
+            $userModel = new \app\models\yiiModels\YiiUserModel();
+            $contacts = $userModel->getPersonsMailsAndName($sessionToken);
 
             if (is_string($projects) || is_string($groups)) {
                 return $this->render('/site/error', [
-                    'name' => 'Internal error',
+                    'name' => Yii::t('app/messages','Internal error'),
                     'message' => is_string($projects) ? $projects : $groups]);
             } else if (is_array($projects) && isset($projects["token"])) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
             } else {
                 $projects = $this->projectsToMap($projects);
                 $groups = $this->groupsToMap($groups);
-                $contacts = $this->contactsToMap($contacts);
                 $this->view->params['listProjects'] = $projects;
                 $this->view->params['listActualProjects'] = $actualProjects; 
                 $this->view->params['listGroups'] = $groups;

@@ -13,15 +13,21 @@
 
 use kartik\icons\Icon;
 use yii\helpers\Html;
-use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
-
+use lavrentiev\widgets\toastr\ToastrAsset;
+use kartik\nav\NavX;
+use \app\models\wsModels\WSConstants;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Url;
+        
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/web_services.php');
 
 AppAsset::register($this);
+ToastrAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -39,7 +45,6 @@ AppAsset::register($this);
     <?php
     //To use the fontawesome glyphicons on the page
     Icon::map($this, Icon::FA);
-    $infrastructureUri = substr(Yii::$app->params['baseURI'], 0, -1);
     
     NavBar::begin([
         'brandLabel' => 'PHIS <i> ' . Yii::$app->params['platform'] . '</i>',
@@ -56,8 +61,8 @@ AppAsset::register($this);
         $menuItems[] = ['label' => Yii::t('app', 'Experimental Organization'),
                         'items' => [
                             [
-                                'label' => Icon::show('home', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Infrastructure} other{Infrastructures}}', ['n' => 2]), 
-                                'url' => ['/infrastructure/view', 'id' => $infrastructureUri],
+                                'label' => Icon::show('home', ['class' => 'fa-large'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Scientific frame} other{Scientific frames}}', ['n' => 2]), 
+                                'url' => ['/infrastructure'],
                             ],
                             [
                                 'label' => Icon::show('folder-open', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Project} other{Projects}}', ['n' => 2]),
@@ -93,7 +98,29 @@ AppAsset::register($this);
                             [
                                 'label' => Icon::show('blackboard', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Vector} other{Vectors}}', ['n' => 2]), 
                                 'url' => ['/vector/index']
-                            ]
+                            ],
+                            [
+                                'label' => Icon::show('screenshot', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Radiometric Target} other{Radiometric Targets}}', ['n' => 2]), 
+                                'url' => ['/radiometric-target/index']
+                            ],
+                            //SILEX:info
+                            //we have stop maintaining this functionnality for now. 
+                            //Uncomment the following block to allow user to download the 4P acquisition session file
+//                            Html::tag('li','',['class' => 'divider']),
+//                            [
+//                                'label' => Yii::t('app', 'Acquisition session template'),
+//                                'items' => [
+//                                    [
+//                                        'label' => Icon::show('file-excel-o', [], Icon::FA). " " . Yii::t('app', "UAV"), 
+//                                        'url' => ['/acquisition-session-metadata-file/generate-uav-metadata-file']
+//                                    ],
+//                                    [
+//                                        'label' => Icon::show('file-excel-o', [], Icon::FA). " " . Yii::t('app', "Phenomobile"), 
+//                                        'url' => ['/acquisition-session-metadata-file/generate-field-robot-metadata-file']
+//                                    ],
+//                                ]
+//                            ]
+                            //\SILEX:info
                         ]];
         $menuItems[] = ['label' => Yii::t('app', 'Tools'),
                         'items' => [
@@ -115,7 +142,7 @@ AppAsset::register($this);
                                 ],
                                 [
                                     'label' => Icon::show('link', [], Icon::BSG) . " " . Yii::t('app', 'Documentation'), 
-                                    'url' => "http://147.100.175.121/phis-docs-community/"
+                                    'url' => "https://opensilex.github.io/phis-docs-community/"
                                 ],
                                 [
                                     'label' => Icon::show('paperclip', [], Icon::BSG) . " " . Yii::t('app', 'Vocabulary'), 
@@ -132,8 +159,8 @@ AppAsset::register($this);
         $menuItems[] = ['label' => Yii::t('app', 'Experimental Organization'),
                         'items' => [
                             [
-                                'label' => Icon::show('home', ['class' => 'fas'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Infrastructure} other{Infrastructures}}', ['n' => 2]), 
-                                'url' => ['/infrastructure/view', 'id' => $infrastructureUri],
+                                'label' => Icon::show('home', ['class' => 'fas'], Icon::FA) . " " . Yii::t('app', '{n, plural, =1{Scientific frame} other{Scientific frames}}', ['n' => 2]), 
+                                'url' => ['/infrastructure'],
                             ],
                             [
                                 'label' => Icon::show('folder-open', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Project} other{Projects}}', ['n' => 2]), 
@@ -168,7 +195,11 @@ AppAsset::register($this);
                             [
                                 'label' => Icon::show('blackboard', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Vector} other{Vectors}}', ['n' => 2]), 
                                 'url' => ['/vector/index']
-                            ]
+                            ],
+                            [
+                                'label' => Icon::show('screenshot', [], Icon::BSG) . " " . Yii::t('app', '{n, plural, =1{Radiometric Target} other{Radiometric Targets}}', ['n' => 2]), 
+                                'url' => ['/radiometric-target/index']
+                            ],
                         ]];
         $menuItems[] = ['label' => Yii::t('app', 'Tools'),
                         'items' => [
@@ -190,7 +221,7 @@ AppAsset::register($this);
                                 ],
                                 [
                                     'label' => Icon::show('link', [], Icon::BSG) . " " . Yii::t('app', 'Documentation'), 
-                                    'url' => "http://147.100.175.121/phis-docs-community/"
+                                    'url' => "https://opensilex.github.io/phis-docs-community/"
                                 ],
                             ]   
                         ];
@@ -201,10 +232,11 @@ AppAsset::register($this);
                         ];
     }
     
-    echo Nav::widget([
+    echo NavX::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'encodeLabels' => false,
-        'items' => $menuItems 
+        'items' => $menuItems,
+        'activateParents' => true,
     ]);
     NavBar::end();
     ?>
@@ -231,11 +263,112 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; INRA MISTEA 2014-2018 (SILEX-PHIS v.2.5 - 22 August 2018)</p>
+        <p class="pull-left">&copy; OpenSILEX - PHIS v.2.6 - 20 September 2018 ; Software is licensed under AGPL-3.0 and data under CC BY-NC-SA 4.0</p>
     </div> 
 </footer> 
 
+<!-- Script for handling user token expiration form -->
+<script>
+    $(document).ready(function() {
 
+        /**
+         * Function which display login form overlay when cookie is expires
+         */
+        var setOverlayTimer = function() {
+            // Token timeout is determined with cookie value
+            var tokenTimeout = Cookies.get("<?= WSConstants::TOKEN_COOKIE_TIMEOUT ?>");
+            var delay = parseInt(tokenTimeout, 10) - Math.floor(Date.now() / 1000);
+            
+            if (delay >= 0) {
+                // Define timeout
+                setTimeout(function() {
+                    $("#login-overlay").css({
+                        opacity: 1,
+                        visibility: "visible"
+                    });
+                }, delay * 1000);
+            } else {
+                // Redirect to login page if delay is already expired and not already on login page
+                var loginUrl = "<?= Yii::$app->urlManager->createUrl("site/login"); ?>";
+                var currentUrl = window.location.href;
+                var traillingUrl = currentUrl.substring(currentUrl.length - loginUrl.length);
+                if (loginUrl != traillingUrl) {
+                    window.location.href = loginUrl;
+                }
+            }
+        }
+        
+        // Inital overlay timer call (on page load)
+        setOverlayTimer();
+        
+        var ajaxUrl = '<?php echo Url::to(['site/login-ajax']) ?>';
+        
+        // When login button is clicked in overlay
+        $("#login-form-ajax").submit(function(event) {
+            event.preventDefault();
+            // Login threw ajax call
+            $.post(ajaxUrl, $("#login-form-ajax").serialize(), function(data) {
+                var jsonData = JSON.parse(data);
+                
+                if (jsonData.success) {
+                    $("#login-overlay .json-error").html("");
+                    if (jsonData.sameUser) {
+                        // If success and same user
+                        // hide the login form
+                        $("#login-overlay").css({
+                            opacity: 0,
+                            visibility: "hidden"
+                        });
+                        // Refresh cookie value
+                        Cookies.set("<?= WSConstants::TOKEN_COOKIE_TIMEOUT ?>", jsonData.tokenTimeout);
+                        // Refresh login form overlay timer
+                        setOverlayTimer();
+                    } else {
+                        // If success but with a new user, redirect to home to reload user rights
+                        window.location.href = "<?= Yii::$app->getHomeUrl(); ?>";
+                    }
+                } else {
+                    // In case of error display it
+                    $("#login-overlay .json-error").html(jsonData.error);
+                }
+            })
+        });
+    });
+</script>
+<!-- Login form to allow user to reconnect without loosing work when token expires -->
+<div id="login-overlay">
+    <?php 
+        $form = ActiveForm::begin([
+            'id' => 'login-form-ajax',
+            'layout' => 'horizontal',
+            'fieldConfig' => [
+                'template' => "<div class=\"row\">{label}\n<div class=\"col-md-5\">{input}</div>\n<div class=\"col-md-5\">{error}</div></div>",
+                'labelOptions' => ['class' => 'col-md-2 control-label'],
+            ],
+        ]);
+        
+        $model = new \app\models\yiiModels\YiiTokenModel();
+    ?>
+        <h2><?= Yii::t('app/messages','Your session has expired') ?></h2>
+
+        <p>
+            <?= Yii::t('app/messages','Please sign-in again:') ?>
+        </p>
+
+        <p style="color:red;"><b class="json-error"></b></p>
+            
+        <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
+
+        <?= $form->field($model, 'password')->passwordInput() ?>
+
+        <div class="row">
+            <div class="col-md-offset-2 col-md-10 login-button">
+                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            </div>
+        </div>
+
+    <?php ActiveForm::end(); ?>
+</div>
 <?php $this->endBody() ?>
 </body>
 </html>

@@ -17,6 +17,8 @@ namespace app\models\wsModels;
 class WSConstants {
 
     const ACCESS_TOKEN = 'access_token';
+    const TOKEN_EXPIRES_IN = 'expires_in';
+    const TOKEN_COOKIE_TIMEOUT = 'tokenTimeout';
     const DATA = 'data';
     const METADATA = 'metadata';
     const PAGINATION = 'pagination';
@@ -25,7 +27,9 @@ class WSConstants {
     const CURRENT_PAGE = 'currentPage';
     const PAGE_SIZE = 'pageSize';
     const PAGE = "page";
-    const TOKEN = 'token';
+    const TOKEN = 'Invalid token';
     const RESULT = 'result';
     const DATA_FILES = 'datafiles';
+    const LANG = "language";
+    const STATUS = "status";
 }

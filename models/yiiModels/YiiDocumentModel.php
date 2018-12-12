@@ -128,6 +128,13 @@ class YiiDocumentModel extends WSActiveRecord {
     const STATUS = "status";
     
     /**
+     *  sortByDate is descending by default it can be "asc" or "desc"
+     * @var string
+     */
+    public $sortByDate;
+    const SORT_BY_DATE = "sortByDate";
+    
+    /**
      * Initialize wsModel. In this class, wsModel is a WSDocumentModel
      * @param string $pageSize number of elements per page
      *                               (limited to 150 000)
@@ -147,8 +154,8 @@ class YiiDocumentModel extends WSActiveRecord {
         return [
           [['uri', 'documentType', 'creator', 'language', 'title', 'creationDate'], 'required'],
           [['uri', 'documentType', 'creator', 'language', 'title', 'creationDate', 
-              'format', 'concernedItems', 'status', 'file', 'comment'], 'safe'],
-          [['uri', 'creator', 'language', 'title', 'creationDate', 'format', 'comment'], 'string'],
+              'format', 'concernedItems', 'status', 'file', 'comment','sortByDate'], 'safe'],
+          [['uri', 'creator', 'language', 'title', 'creationDate', 'format', 'comment','sortByDate'], 'string'],
           [['file'], 'file', 'skipOnEmpty' => false]
         ];
     }
@@ -170,7 +177,8 @@ class YiiDocumentModel extends WSActiveRecord {
           'concernedItems' => Yii::t('app', 'Concern'),
           'file' => Yii::t('app', 'File'),
           'comment' => Yii::t('app', 'Comment'),
-          'status' => Yii::t('app', 'Status') 
+          'status' => Yii::t('app', 'Status'),
+          'sortByDate' => Yii::t('app', 'Sort by date') 
         ];
     }
     
@@ -199,6 +207,7 @@ class YiiDocumentModel extends WSActiveRecord {
      * @return array with the attributes. 
      */
     public function attributesToArray() {
+        $elementForWebService = parent::attributesToArray();
         $elementForWebService[YiiDocumentModel::DOCUMENT_TYPE] = $this->documentType;
         $elementForWebService[YiiDocumentModel::URI] = $this->uri;
         $elementForWebService[YiiDocumentModel::CREATOR] = $this->creator;
@@ -209,6 +218,7 @@ class YiiDocumentModel extends WSActiveRecord {
         $elementForWebService[YiiDocumentModel::CHECKSUM] = $this->md5;
         $elementForWebService[YiiDocumentModel::COMMENT] = $this->comment;
         $elementForWebService[YiiDocumentModel::STATUS] = $this->status;
+        
         
         if ($this->concernedItems !== null) {
             foreach ($this->concernedItems as $concern) {
@@ -221,6 +231,10 @@ class YiiDocumentModel extends WSActiveRecord {
         //Used for the search
         if ($this->concernedItem !== null) {
             $elementForWebService[YiiDocumentModel::CONCERNED_ITEM] = $this->concernedItem;
+        }
+        
+        if( $this->sortByDate != null){
+            $elementForWebService[YiiDocumentModel::SORT_BY_DATE] = $this->sortByDate;
         }
         
         return $elementForWebService;
