@@ -25,7 +25,7 @@ use kartik\form\ActiveForm;
 $(document).ready(function(){
     $("#groupURI").tooltip();
     $("#groupName").tooltip();
-    $('#groupOrganism').tooltip();
+    $('#groupOrganization').tooltip();
     $('#groupLaboratoryName').tooltip();
 });
 
@@ -40,20 +40,14 @@ function changeSpaces(text, idInput) {
     $("#" + idInput).val(text.replace(" ", '.'));
 }
 
-//le nom est composé de l'oganisme - name
+//le nom est composé de l'organisme - name
 function updateName() {
-    var organism = $('#groupOrganism').val();
-    var name = organism + "-" + $('#groupName').val();
+    var organization = $('#groupOrganization').val();
+    var name = organization + "-" + $('#groupName').val();
 
-    $(".input-group-addon").text(organism + "-");
+    $(".input-group-addon").text(organization + "-");
     
     updateURI(name);
-}
-
-function updateURI(name) {
-    var uri = '<?php echo Yii::$app->params['baseURI'] ?>';
-    
-    $("#groupURI").val(uri + name);
 }
 </script>
 
@@ -61,16 +55,7 @@ function updateURI(name) {
     <?php $form = ActiveForm::begin(); ?>
     
     <?php 
-    if ($model->isNewRecord) {
-        echo $form->field($model, 'uri')->textInput([
-            'maxlength' => true,
-            'readonly' => true, 
-            'id' => 'groupURI',
-            'style' => 'background-color:#C4DAE7;',
-            'data-toogle' => 'tooltip',
-            'title' => 'Automatically generated', 
-            'data-placement' => 'left']);
-    } else {
+    if (!$model->isNewRecord) {
         echo $form->field($model, 'uri')->textInput([
             'maxlength' => true,
             'readonly' => true, 
@@ -88,7 +73,7 @@ function updateURI(name) {
                     'id' => 'groupName'
                     ],
                 'addon' => [
-                    'prepend' => ['content'=>'ORGANISM-'],]]);
+                    'prepend' => ['content'=> Yii::t('app', 'ORGANIZATION') . '-'],]]);
     } else {
         echo $form->field($model, 'name')->textInput(['readonly' => true, 'style' => 'background-color:#C4DAE7;']);
     }
@@ -97,14 +82,14 @@ function updateURI(name) {
     
     <?php 
     if ($model->isNewRecord) {
-        echo $form->field($model, 'organism')->textInput([
+        echo $form->field($model, 'organization')->textInput([
             'maxlength' => true,
             'onkeyup' => 'upperCase(this.value, this.id);changeSpaces(this.value, this.id);',
-            'id' => 'groupOrganism',
+            'id' => 'groupOrganization',
             'onChange' => 'updateName();',
             'data-toogle' => 'tooltip',
             'title' => 'Used for the URI. Example : INRA', 
-            'placeholder' => 'ORGANISM',
+            'placeholder' => Yii::t('app', 'ORGANIZATION'),
             'data-placement' => 'left']);
     }
     ?>    

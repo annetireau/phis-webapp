@@ -44,7 +44,7 @@ class VariableSearch extends YiiVariableModel {
      * @return mixed DataProvider of the result 
      *               or string \app\models\wsModels\WSConstants::TOKEN if the user needs to log in
      */
-    public function search($sessionToken, $params) {
+    public function search($sessionToken, $params, $withDetails = false) {
         //1. load the searched params 
         $this->load($params);
         if (isset($params[YiiModelsConstants::PAGE])) {
@@ -56,14 +56,18 @@ class VariableSearch extends YiiVariableModel {
             return new \yii\data\ArrayDataProvider();
         }
         
+        $subservice = "";
+        if ($withDetails) {
+            $subservice = "/details";
+        }
         //3. Request to the web service and return result
-        $findResult = $this->find($sessionToken, $this->attributesToArray());
+        $findResult = $this->find($sessionToken, $this->attributesToArray(), $subservice);
         
         if (is_string($findResult)) {
             return $findResult;
         } else if (isset($findResult->{'metadata'}->{'status'}[0]->{'exception'}->{'details'}) 
-                    && $findResult->{'metadata'}->{'status'}[0]->{'exception'}->{'details'} === \app\models\wsModels\WSConstants::TOKEN) {
-            return \app\models\wsModels\WSConstants::TOKEN;
+                    && $findResult->{'metadata'}->{'status'}[0]->{'exception'}->{'details'} === \app\models\wsModels\WSConstants::TOKEN_INVALID) {
+            return \app\models\wsModels\WSConstants::TOKEN_INVALID;
         } else {
             $resultSet = $this->jsonListOfArraysToArray($findResult);
             return new \yii\data\ArrayDataProvider([
@@ -78,20 +82,5 @@ class VariableSearch extends YiiVariableModel {
                 //\SILEX:info
             ]);
         }
-    }
-    
-    /**
-     * transform the json into array
-     * @param json jsonList
-     * @return array
-     */
-    private function jsonListOfArraysToArray($jsonList) {
-        $toReturn = []; 
-        if ($jsonList !== null) {
-            foreach ($jsonList as $value) {
-                $toReturn[] = $value;
-            }
-        } 
-        return $toReturn;
     }
 }

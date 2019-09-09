@@ -26,10 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php //echo $this->render('_search', ['model' => $searchModel]); ?>
-
+    <?php if (Yii::$app->session['isAdmin']) { ?>
     <p>
         <?= Html::a(Yii::t('yii', 'Create') . ' ' . Yii::t('app', '{n, plural, =1{Variable} other{Variables}}', ['n' => 1]), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+    <?php } ?>
     
    <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -48,7 +49,10 @@ $this->params['breadcrumbs'][] = $this->title;
                    'data' => $listTraits,
                    'options' => [
                        'placeholder' => Yii::t('app', 'Select trait alias...')
-                   ]
+                   ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
                  ]),
             ],
             [
@@ -63,7 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
                      'data' => $listMethods,
                      'options' => [
                          'placeholder' => Yii::t('app', 'Select method alias...')
-                     ]
+                     ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
                  ]),
             ],
             [
@@ -78,7 +85,10 @@ $this->params['breadcrumbs'][] = $this->title;
                      'data' => $listUnits,
                      'options' => [
                          'placeholder' => Yii::t('app', 'Select unit alias...')
-                     ]
+                     ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
                  ]),
             ],
             ['class' => 'yii\grid\ActionColumn',

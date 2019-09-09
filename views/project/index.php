@@ -15,6 +15,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 
+use kartik\date\DatePicker;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProjectSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -27,9 +29,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php //echo $this->render('_search', ['model' => $searchModel]); ?>
 
+    <?php if (Yii::$app->session['isAdmin']) { ?>
     <p>
         <?= Html::a(Yii::t('yii', 'Create') . ' '. Yii::t('app', '{n, plural, =1{Project} other{Projects}}', ['n' => 1]), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+    <?php } ?>
     
    <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -37,21 +41,40 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            //'uri',
-            //'name',
-            'acronyme',
-            'financialSupport',
-            'dateStart',
-            'dateEnd',
-            // 'subprojectType',
-            // 'financialName',
-            // 'keywords',
-            // 'description',
-            // 'objective',
-            // 'parentProject',
-            // 'scientificContact',
-            // 'administrativeContact',
-            // 'projectCoordinator'
+            'shortname',
+            [
+              'attribute' => 'financialFunding',
+              'format' => 'raw',
+              'value' => function($model, $key, $index) {
+                    return $model->financialFunding->label;
+               },
+            ],
+            [
+              'attribute' => 'startDate',
+              'format' => 'raw',
+              'value' => 'startDate',
+              'filter' => DatePicker::widget([
+                    'model' => $searchModel, 
+                    'attribute' => 'startDate',
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'yyyy-mm-dd'
+                    ]
+                ]),
+            ],
+            [
+              'attribute' => 'endDate',
+              'format' => 'raw',
+               'value' => 'endDate',
+              'filter' => DatePicker::widget([
+                    'model' => $searchModel, 
+                    'attribute' => 'endDate',
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'yyyy-mm-dd'
+                    ]
+                ]),
+            ],
 
             ['class' => 'yii\grid\ActionColumn',
                 'template' => '{view}',

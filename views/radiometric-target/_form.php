@@ -22,18 +22,7 @@ use kartik\file\FileInput;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <?php
-    if ($model->isNewRecord) {
-        echo $form->field($model, 'uri')->textInput([
-            'maxlength' => true,
-            'readonly' => true,
-            'id' => 'experimentURI',
-            'value' => Yii::$app->params['baseURI'],
-            'style' => 'background-color:#C4DAE7;',
-            'data-toggle' => 'tooltip',
-            'title' => 'Automatically generated',
-            'data-placement' => 'left'
-        ]);
-    } else {
+    if (!$model->isNewRecord) {
         echo $form->field($model, 'uri')->textInput([
             'readonly' => true,
             'style' => 'background-color:#C4DAE7;',
@@ -148,7 +137,7 @@ use kartik\file\FileInput;
 
     <?= $form->field($model, 'diameter')->textInput(['maxlength' => true]) ?>
 
-    <?= Yii::t('app', 'A radiometric target can be described by the value of its coefficients to the bidirectional reflectance distribution function (see the BRDF '),
+    <?= Yii::t('app/messages', 'A radiometric target can be described by the value of its coefficients to the bidirectional reflectance distribution function (see the BRDF '),
             Html::a(Yii::t('app', 'wikipedia page'), "https://en.wikipedia.org/wiki/Bidirectional_reflectance_distribution_function", ['target' => '_blank']),
             '):' ?>
     <div class="text-center">
@@ -159,6 +148,28 @@ use kartik\file\FileInput;
     <?= $form->field($model, 'brdfP2')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'brdfP3')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'brdfP4')->textInput(['maxlength' => true]) ?>
+
+    <div class="alert alert-info" role="alert">
+        <b><?= Yii::t('app/messages', 'File Rules')?> : </b>
+        <table class="table table-hover" id="radiometric-target-csv-columns-desc">
+            <tr>
+                <th style="color:red"><?= Yii::t('app', 'Wavelength (nm)') ?> * </th>
+                <td><p><?= Yii::t('app/messages', 'Values in nanometers (450 nm, 560 nm, ...) of the wavelengths at which the radiometric target reflectance has been measured (real numbers)') ?> </p> </td>
+            </tr>
+             <tr class="dataset-variables">
+                <th style="color:red"><?=Yii::t('app', 'Reflectance value') ?> * </th>
+                <td ><?= Yii::t('app/messages', 'Values of the spectral hemispherical reflectance in wavelength of the radiometric target for each of the wavelength listed in the first row (real numbers included in a range of [0 - 1])') ?></td>
+            </tr>
+            <tr>
+                <th><p><?= Yii::t('app/messages', 'The spectral hemispherical reflectance file uses tabluations (\t) as field separators and dots (.) as decimal separators.') ?> </p> </th>
+            </tr>
+        </table>
+    </div>
+
+
+    <p><i>
+         <?= Html::a("<span class=\"glyphicon glyphicon-download-alt\" aria-hidden=\"true\"></span> " . Yii::t('app', 'Download Template'), \config::path()['basePath'] . 'documents/SpectralHemisphericalReflectanceFiles/SpectralHemisphericalReflectanceTemplate.csv', ['id' => 'downloadReflectanceTemplate']) ?>
+    </i></p>
 
     <?php
     if (!$hideFiles) {
@@ -180,4 +191,3 @@ use kartik\file\FileInput;
 
 <?php ActiveForm::end(); ?>
 </div>
-

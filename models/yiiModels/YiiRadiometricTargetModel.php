@@ -238,7 +238,7 @@ class YiiRadiometricTargetModel extends WSActiveRecord {
         $requestRes = $this->wsModel->getDetails($sessionToken, $uri);
 
         if (!is_string($requestRes)) {
-            if (isset($requestRes[\app\models\wsModels\WSConstants::TOKEN])) {
+            if (isset($requestRes[\app\models\wsModels\WSConstants::TOKEN_INVALID])) {
                 return $requestRes;
             } else {
                 $this->uri = $uri;
@@ -264,7 +264,7 @@ class YiiRadiometricTargetModel extends WSActiveRecord {
                 case Yii::$app->params['hasBrand']:
                     $this->brand = $property->value;
                     break;
-                case Yii::$app->params['serialNumber']:
+                case Yii::$app->params['hasSerialNumber']:
                     $this->serialNumber = $property->value;
                     break;                
                 case Yii::$app->params['inServiceDate']:
@@ -379,11 +379,11 @@ class YiiRadiometricTargetModel extends WSActiveRecord {
      *      label => 'radiometric target label'
      *      properties => [
      *          [
-     *              relation => 'http://www.phenome-fppn.fr/vocabulary/2017#hasBrand'
+     *              relation => 'http://www.opensilex.org/vocabulary/oeso#hasBrand'
      *              value => 'brand name'
      *          ],
      *          [
-     *              relation => 'http://www.phenome-fppn.fr/vocabulary/2017#hasRadiometricTargetMaterial'
+     *              relation => 'http://www.opensilex.org/vocabulary/oeso#hasRadiometricTargetMaterial'
      *              value => 'spectralon'
      *          ],...
      *      ]
@@ -426,7 +426,7 @@ class YiiRadiometricTargetModel extends WSActiveRecord {
 
         if ($this->serialNumber) {
             $properties[] = [
-                self::RELATION =>  Yii::$app->params['serialNumber'],
+                self::RELATION =>  Yii::$app->params['hasSerialNumber'],
                 self::VALUE => $this->serialNumber
             ];
         }

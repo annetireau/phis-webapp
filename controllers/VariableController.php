@@ -87,10 +87,10 @@ class VariableController extends Controller {
             $searchParams[\app\models\yiiModels\YiiModelsConstants::PAGE]--;
         }
 
-        $searchResult = $searchModel->search($sessionToken, $searchParams);
+        $searchResult = $searchModel->search($sessionToken, $searchParams, true);
         
         if (is_string($searchResult)) {
-            if ($searchResult === \app\models\wsModels\WSConstants::TOKEN) {
+            if ($searchResult === \app\models\wsModels\WSConstants::TOKEN_INVALID) {
                 return $this->redirect(Yii::$app->urlManager->createUrl("site/login"));
             } else {
                 return $this->render('/site/error', [

@@ -14,14 +14,14 @@
 // - Yii2 configuration file
 //***********************************************************************************************
 class config {
-    
+
     public static function path() {
 
         $appli = 'phis-webapp';
         $hostname = 'localhost';
-        
+
         $basePath = $appli.'/web';
-        
+
         return [
             'appli' => $appli,
             'baseIndexURL' => 'http://'.$hostname.'/'.$basePath.'/index.php',
@@ -31,11 +31,12 @@ class config {
             'basePath' => '/'.$basePath.'/',
             'hostnameURL' => 'http://'.$hostname.'/'.$appli,
             'documentsUrl' => '../web/documents/',
+            'ocpuServer' => 'http://'.$hostname.':8004/ocpu/',
             //Concepts, relations uri
-            'cVariable' => 'http://www.phenome-fppn.fr/vocabulary/2017#Variable',
-            'cTrait' => 'http://www.phenome-fppn.fr/vocabulary/2017#Trait',
-            'cMethod' => 'http://www.phenome-fppn.fr/vocabulary/2017#Method',
-            'cUnit' => 'http://www.phenome-fppn.fr/vocabulary/2017#Unit',
+            'cVariable' => 'http://www.opensilex.org/vocabulary/oeso#Variable',
+            'cTrait' => 'http://www.opensilex.org/vocabulary/oeso#Trait',
+            'cMethod' => 'http://www.opensilex.org/vocabulary/oeso#Method',
+            'cUnit' => 'http://www.opensilex.org/vocabulary/oeso#Unit',
             'rExactMatch' => 'http://www.w3.org/2008/05/skos#exactMatch',
             'rCloseMatch' => 'http://www.w3.org/2008/05/skos#closeMatch',
             'rNarrower' => 'http://www.w3.org/2008/05/skos#narrower',
